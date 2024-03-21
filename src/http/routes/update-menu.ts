@@ -1,24 +1,24 @@
-import Elysia, { Static, t } from 'elysia'
-import { authentication } from '../authentication'
-import { db } from '@/db/connection'
-import { products } from '@/db/schema'
-import { and, eq, inArray } from 'drizzle-orm'
+import Elysia, { Static, t } from "elysia";
+import { authentication } from "../authentication";
+import { db } from "@/db/connection";
+import { products } from "@/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 
 const productSchema = t.Object({
   id: t.Optional(t.String()),
   name: t.String(),
   description: t.Optional(t.String()),
   price: t.Number({ minimum: 0 }),
-})
+});
 
 export const updateMenu = new Elysia().use(authentication).put(
-  '/menu',
+  "/menu",
   async ({ getManagedRestaurantId, set, body }) => {
-    const restaurantId = await getManagedRestaurantId()
+    const restaurantId = await getManagedRestaurantId();
 
     const {
       products: { deletedProductIds, newOrUpdatedProducts },
-    } = body
+    } = body;
 
     if (deletedProductIds.length > 0) {
       await db
@@ -26,20 +26,20 @@ export const updateMenu = new Elysia().use(authentication).put(
         .where(
           and(
             inArray(products.id, deletedProductIds),
-            eq(products.restaurantId, restaurantId),
-          ),
-        )
+            eq(products.restaurantId, restaurantId)
+          )
+        );
     }
 
-    type Product = Static<typeof productSchema>
-    type ProductWithId = Required<Product>
-    type ProductWithoutId = Omit<Product, 'id'>
+    type Product = Static<typeof productSchema>;
+    type ProductWithId = Required<Product>;
+    type ProductWithoutId = Omit<Product, "id">;
 
     const updatedProducts = newOrUpdatedProducts.filter(
       (product): product is ProductWithId => {
-        return !!product.id
-      },
-    )
+        return !!product.id;
+      }
+    );
 
     if (updatedProducts.length > 0) {
       await Promise.all(
@@ -54,18 +54,18 @@ export const updateMenu = new Elysia().use(authentication).put(
             .where(
               and(
                 eq(products.id, product.id),
-                eq(products.restaurantId, restaurantId),
-              ),
-            )
-        }),
-      )
+                eq(products.restaurantId, restaurantId)
+              )
+            );
+        })
+      );
     }
 
     const newProducts = newOrUpdatedProducts.filter(
       (product): product is ProductWithoutId => {
-        return !product.id
-      },
-    )
+        return !product.id;
+      }
+    );
 
     if (newProducts.length) {
       await db.insert(products).values(
@@ -75,12 +75,12 @@ export const updateMenu = new Elysia().use(authentication).put(
             description: product.description,
             priceInCents: product.price * 100,
             restaurantId,
-          }
-        }),
-      )
+          };
+        })
+      );
     }
 
-    set.status = 204
+    set.status = 204;
   },
   {
     body: t.Object({
@@ -89,5 +89,5 @@ export const updateMenu = new Elysia().use(authentication).put(
         deletedProductIds: t.Array(t.String()),
       }),
     }),
-  },
-)
+  }
+);
