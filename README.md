@@ -4,9 +4,11 @@ Food delivery app (aka. iFood/Uber Eats) back-end built with TypeScript, Drizzle
 
 > 🔥 This project aims to keep runtime agnostic, this means it should work on Bun, Node, Cloudflare Workers or any Web Standard API compatible runtime.
 
+- [Front-end - Web](https://github.com/leticea/pizza-shop)
+
 ## Running
 
-This project depends on Docker to setup database. With Docker installed, clone the project, install  dependencies, setup Docker containers and run the application.
+This project depends on Docker to setup database. With Docker installed, clone the project, install dependencies, setup Docker containers and run the application.
 
 > You must also run migrations to create database tables and run the seed to populate the database with fake data.
 
